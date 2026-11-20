@@ -1,0 +1,191 @@
+// ==========================================
+// CHAPTER CARDS - DYNAMIC LORE
+// DLS - DYNAMIC LORE SYSTEM
+// VERSION 1.2 (WITH REVEAL TRIGGERS)
+// ==========================================
+// SETTINGS
+const DLS_SETTINGS = {
+    enabled: true,
+    createOnce: true
+};
+// Keep enabled true and createOnce true for the script
+// to work as intended.
+
+// =================================
+// 🎴 PREMADE CHARACTER CARDS GO HERE
+// =================================
+const DLS_CARDS = [
+
+ // BLANK CARD TEMPLATE
+    {
+        name: "CARD NAME",       // Name, Card Title
+
+        triggers: [
+            "TRIGGER 1a",
+            "TRIGGER 2a",
+            "TRIGGER 3a",
+            "TRIGGER last"
+        ],  // These are the normal Story Card triggers.
+        // They are stored in the Story Card's trigger field.
+        // Keep these short because of the 100-character limit.
+
+        revealTriggers: [
+            "REVEAL TRIGGER 1",
+            "REVEAL TRIGGER 2",
+            "ANOTHER EXTRA WORD OR PHRASE",
+            "EXTRA TITLE OR NICKNAME",
+            "However Short phrases and words work best as people will need to put the EXACT phrase and letters to effectively trigger the card to show"
+        ],
+        // Additional CCDL reveal keywords. TEMPORARY, but work the SAME way as "triggers"
+        // Story Cards WILL add them temporarily at the end of the regular trigger words.
+        // Normal trigger list. Limited to 100 characters. 
+        // THESE triggers WILL generate the same card (this card) if/when inputted.
+        // the Story Card's trigger keys for that turn.
+
+        type: "CUSTOM TYPE",
+        // Custom type OR use a built-in type:
+        // "character", "race", "location", "class", "faction"
+        // Note: Keep built-in types lowercase!
+
+        entry: `WHAT IS PUT HERE WILL BE IN THE STORY CARD.`,
+        // Story Card entry. 2000-character limit.
+        // Story Cards Longer than 2000 characters may not properly generate
+
+        notes: "DO NOT DELETE: 🎴 Automatically generated Chapter Cards - Dynamic Lore."
+        //Keep notes the same. Unless
+    },
+ // END OF BLANK CARD TEMPLATE
+
+
+    // =================================
+    // EXAMPLE CARD
+    // =================================
+    // TO TEST: Press play and type one of the triggers
+    // into an adventure. For example: Antonov.
+    // TO REMOVE EXAMPLE: Delete from {name: "Anton"
+    // down to the END OF EXAMPLE CARD comment.
+    {
+        name: "Anton",
+
+        triggers: [
+            "Anton",
+            "Petrov",
+            "Antonov"
+        ],
+
+        revealTriggers: [
+            "the young Petrov",
+            "Anton's family"
+        ],
+
+        type: "character",
+
+        entry: `Anton Petrov is a sample Character for CCDL. Chapter Cards - Dynamic Lore.`,
+
+        notes: "DO NOT DELETE: 🎴 Automatically generated Chapter Cards - Dynamic Lore."
+    },
+
+
+        // TRUE BLANK W/O Guide, Copy -> Paste -> Replace Orange text. Erase this line Remove Multiple line comment ## THE ONLY THING on line 91 and its closing at line 108... REMOVE "/*" and "*/"
+
+        /*
+
+        { name: "Name",
+        triggers: [
+            "trigger",
+            "keyword",
+            "hello world",
+        ],  
+        revealTriggers: [
+            "RT",
+            "Reveal trigger",
+        ],
+        type: "Generated Card",
+        entry: `WHAT IS PUT HERE WILL BE IN THE STORY CARD.`, //2000
+        notes: "DO NOT DELETE: 🎴 Automatically generated Chapter Cards - Dynamic Lore."
+    },
+
+    */
+
+
+    // TO ADD MORE CARDS:
+    // Copy a blank card from {name:
+    // to its closing },
+    // HAVE FUN CUSTOMIZING!
+
+]; // 🛑 End of character cards. DO NOT REMOVE.
+// ⚠️⚠️⚠️ DO NOT EDIT BEYOND THIS POINT ⚠️⚠️⚠️
+
+// =================================
+// DLS CARD GENERATOR
+// =================================
+ function DLS_Check(input) {
+    if (!DLS_SETTINGS.enabled) return;
+    const playerInput = input.toLowerCase();
+    for (const card of DLS_CARDS) {
+
+        // Prepare the normal Story Card triggers.
+        const cardKeys = card.triggers.join(", ");
+
+        // Check normal triggers.
+        const matched = card.triggers.some(trigger =>
+            playerInput.includes(trigger.toLowerCase())
+        );
+
+        // Check additional reveal triggers.
+        const revealMatches = (card.revealTriggers || []).filter(trigger =>
+            playerInput.includes(trigger.toLowerCase())
+        );
+
+        // Find an existing Story Card.
+        const existingIndex = storyCards.findIndex(existing =>
+            existing.title === card.name ||
+            existing.keys === cardKeys
+        );
+
+        // =================================
+        // EXISTING STORY CARD
+        // =================================
+        if (existingIndex !== -1) {
+            // Start with the short triggers.
+            let updatedKeys = cardKeys;
+            // Temporarily add any matching reveal triggers.
+            if (revealMatches.length > 0) {
+                updatedKeys += ", " + revealMatches.join(", ");
+            }
+            // Update the existing Story Card.
+            updateStoryCard(
+                existingIndex,
+                updatedKeys,
+                card.entry,
+                card.type,
+                card.name,
+                card.notes
+            );
+            if (revealMatches.length > 0) {
+                log("DLS: Revealed " + card.name);
+            }
+            continue;
+        }
+        // =================================
+        // NEW STORY CARD FUNCTION
+        // =================================
+        // No matching keyword? Skip this card.
+        if (!matched && revealMatches.length === 0) continue;
+        // If a reveal trigger matched, include it in the
+        // new card's keys so it can activate immediately.
+        let newKeys = cardKeys;
+        if (revealMatches.length > 0) {
+            newKeys += ", " + revealMatches.join(", ");
+        }
+        // Create the Story Card.
+        addStoryCard(
+            newKeys,
+            card.entry,
+            card.type,
+            card.name,
+            card.notes
+        );
+        log("DLS: Created " + card.name);
+    }
+}
